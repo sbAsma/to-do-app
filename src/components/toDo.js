@@ -8,14 +8,11 @@ import {
     FormControlLabel,
     Checkbox,
     TextField,
+    Icon,
 } from "@material-ui/core";
-import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import DoneIcon from '@material-ui/icons/Done';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import Brightness3Icon from '@material-ui/icons/Brightness3';
-import WbSunnyIcon from '@material-ui/icons/WbSunny';
-// import "./App.css";
+
+import ToDoList from './toDoList';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,12 +20,14 @@ const useStyles = makeStyles((theme) => ({
 		backgroundRepeat: "no-repeat",
 		backgroundSize: "100% 270px",
         backgroundColor: theme.palette.background.default,
-		height: "100vh",
+		height: "100vh", // changed from "100%"
+        [theme.breakpoints.down('xs')]: {
+            height: "100%",
+        },
         width: "100%",
 		display: 'flex',
     },
 	content: {
-		// backgroundColor: theme.palette.background.paper,
 		height: "auto",
         width: "570px",
 		display: 'flex',
@@ -36,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
 		margin: '70px auto 130px auto',
 	},
     title: {
-		// backgroundColor: "green",
 		display: 'flex',
 		flexDirection: 'row',
 		width: '100%',
@@ -54,30 +52,61 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
 		flexDirection: 'row',
         alignItems: 'left',
-        // justifyContent: 'space-between',
 		marginBottom: '50px',
         borderRadius: '5px',
 		width: '100%',
 		height: '55px',
         backgroundColor: theme.palette.background.paper,
     },
-    inputTodoText: {
+    inputTodoTextField: {
         paddingTop: '5px',
         justifyContent: 'center',
         marginRight: '15px',
-        marginLeft: '0',
+        marginLeft: '0', 
+        color: theme.palette.text.primary,
     },
+    // inputTodoText: {
+    //     color: "red",
+    // },
     inputTodoIcon: {
         width: '60px',
         justifyContent: 'center',
         margin: 'auto',
+    },
+    imageIcon: {
+        height: '100%',
+    },
+    iconRoot: {
+        textAlign: 'center'
+    },
+    radioButtonUncheckedIcon: {
+        width: "20px",
+        height: "20px",
+        borderRadius: "11px",
+        borderStyle: 'solid',
+        borderWidth: 'thin',
+    },
+    checkBox: {
+        "&:hover": {
+            "& div": {
+                width: "20px",
+                height: "20px",
+                border: '1px solid transparent',
+                backgroundImage: 'linear-gradient('+theme.palette.background.paper
+                                +', '+theme.palette.background.paper
+                                +'), radial-gradient(circle at top left,' 
+                                +'hsl(192, 100%, 67%),hsl(280, 87%, 65%))',
+                backgroundOrigin: 'border-box',
+                backgroundClip: 'content-box, border-box',
+            }
+        }
     },
 	[theme.breakpoints.down('xs')]: {
 		root: {
 			backgroundImage: theme.palette.background.bgMobile,
 		},
 		content: {
-			width: '80%',
+			width: '90%',
 		},
 	},
 	[theme.breakpoints.between('sm', 'md')]: {
@@ -89,17 +118,28 @@ const useStyles = makeStyles((theme) => ({
 export default function ToDo({theme, changeTheme}) {
     const classes = useStyles();
     const [todo, setTodo] = useState({
+        isSubmit: false,
         text: '',
         checked: false,
     })
     const handleNewTodo = (e) =>{
-        console.log(e.target.name)
         if(e.target.name === "checked") setTodo({...todo, checked: !todo.checked,})
         else setTodo({...todo, [e.target.name]: e.target.value,})
     }
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        setTodo({...todo, isSubmit: true})
+    }
+    const afterSubmit = () => {
+        setTodo({
+            isSubmit: false,
+            text: '',
+            checked: false,
+        })
+    }
     return (
         <div  component="main" className={classes.root}>
-            <Grid container className={classes.content}>
+            <Grid  className={classes.content}>
                 <Box className={classes.title} xs={12} >
                     <Typography 
                         variant="h4"
@@ -113,54 +153,80 @@ export default function ToDo({theme, changeTheme}) {
                         style={{
                             color: 'white',
                             paddingRight: '0px',
+                            background: "none",
                         }}
                         disableRipple={true}
                     >
-                        {theme==='light'? <Brightness3Icon/> : <WbSunnyIcon/>}
+                        {theme==='light'? <Icon classes={{root: classes.iconRoot}}>
+                                            <img 
+                                                className={classes.imageIcon} 
+                                                src="/images/icon-moon.svg"
+                                                alt="moon icon"
+                                            />
+                                        </Icon>
+                                        : <Icon classes={{root: classes.iconRoot}}>
+                                            <img 
+                                                className={classes.imageIcon} 
+                                                src="/images/icon-sun.svg"
+                                                alt="sun icon"
+                                            />
+                                        </Icon>
+                        }
                     </IconButton>
                 </Box>
-                <Box className={classes.inputTodo} xs={12} >
-                    <FormControlLabel
-                        className={classes.inputTodoIcon}
-                        control={
-                            <Checkbox 
-                                icon={<RadioButtonUncheckedIcon 
-                                        style={{
-                                            fontSize: '30px',
-                                        }}
-                                    />} 
-                                checkedIcon={<DoneIcon 
-                                                style={{
-                                                    color: "white",
-                                                    fontSize: '15px',
-                                                }}
-                                            />}
-                                style={
-                                    todo.checked?{
-                                        background: 'linear-gradient(to right bottom, hsl(192, 100%, 67%), hsl(280, 87%, 65%))',
-                                        width: '4px',
-                                        height: '4px',
-                                    }: {}
+                <Box  xs={12} >
+                    <form  className={classes.inputTodo} onSubmit={handleSubmit}>
+                        <FormControlLabel
+                            className={classes.inputTodoIcon}
+                            control={
+                                <Checkbox 
+                                    icon={
+                                        <div className={classes.radioButtonUncheckedIcon} />
+                                    }
+                                    checkedIcon={<DoneIcon 
+                                                    style={{
+                                                        color: "white",
+                                                        fontSize: '15px',
+                                                    }}
+                                                />}
+                                    style={
+                                        todo.checked?{
+                                            background: 'linear-gradient(to right bottom, hsl(192, 100%, 67%), hsl(280, 87%, 65%))',
+                                            width: '4px',
+                                            height: '4px',
+                                        }: {background: 'none'}
+                                    }
+                                    name="checked" 
+                                    checked={todo.checked}
+                                    onChange={handleNewTodo}
+                                    disableRipple={true}
+                                    className={classes.checkBox}
+                                />
+                            }
+                        />
+                        <TextField 
+                            type="text" 
+                            name="text"
+                            value={todo.text} 
+                            onChange={handleNewTodo} 
+                            fullWidth
+                            focused={false}
+                            InputProps={{
+                                disableUnderline: true,
+                                classes: {
+                                    input: classes.inputTodoTextField
                                 }
-                                name="checked" 
-                                checked={todo.checked}
-                                onChange={handleNewTodo}
-                                disableRipple={true}
-                            />
-                        }
-                    />
-                    <TextField 
-                        type="text" 
-                        name="text"
-                        value={todo.text} 
-                        onChange={handleNewTodo} 
-                        // variant= "outlined"
-                        fullWidth
-                        focused={false}
-                        InputProps={{disableUnderline: true}}
-                        className= {classes.inputTodoText}
-                    />
+                            }}
+                            className= {classes.inputTodoTextField}
+                        />
+                    </form>
                 </Box>
+                <ToDoList
+                    isSubmit={todo.isSubmit}
+                    text={todo.text}
+                    checked={todo.checked}
+                    afterSubmit={afterSubmit}
+                />
             </Grid>
         </div>
     )
