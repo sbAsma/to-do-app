@@ -107,6 +107,9 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
 		flexDirection: 'row',
         justifyContent: 'center',
+        [theme.breakpoints.down('xs')]: {
+            marginTop: '105px',
+        }
     },
     reorderMsg: {
         fontWeight: 700,
