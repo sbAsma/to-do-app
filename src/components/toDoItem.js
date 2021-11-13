@@ -52,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: "11px",
         borderStyle: 'solid',
         borderWidth: 'thin',
+        color: theme.palette.border.primary,
     },
     checkBox: {
         "&:hover": {
@@ -72,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
         margin: "0px",
         border: "none",
         height: '1px',
-        backgroundColor: theme.palette.text.secondary,
+        backgroundColor: theme.palette.border.primary,
     },
 }))
 
