@@ -23,11 +23,15 @@ function App() {
 						default: theme==='light'? "hsl(0, 0%, 98%)": "hsl(235, 21%, 11%)",
 						paper: theme==='light'? "white": "hsl(235, 24%, 19%)",
 					},
+					border:{
+						primary: theme==='light'?   "hsl(233, 11%, 84%)":
+													  "hsl(233, 14%, 35%)",
+					},
 					text:{
 						primary: theme==='light'?   "hsl(235, 19%, 35%)":
 													"hsl(234, 39%, 85%)",
-						secondary: theme==='light'?   "hsl(233, 11%, 84%)":
-													  "hsl(233, 14%, 35%)",
+						secondary: theme==='light'?   "hsl(236, 9%, 61%)":
+													  "hsl(234, 11%, 52%)",
 						hover: theme==='light'?   "hsl(235, 19%, 35%)":
 													  "hsl(236, 33%, 92%)",
 					},
