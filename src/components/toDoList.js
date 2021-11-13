@@ -2,81 +2,20 @@ import React, { useEffect, useState } from 'react'
 import { 
     DragDropContext, 
     Droppable,
-    Draggable,
 } from 'react-beautiful-dnd';
 import { makeStyles } from '@material-ui/core'
 import {
 	Typography,
 	Box,
-    IconButton,
-    FormControlLabel,
-    Checkbox,
     Button,
-    Icon,
-    ListItem,
 } from '@material-ui/core'
-import DoneIcon from '@material-ui/icons/Done';
+import ToDoItem from './toDoItem'
 
 const useStyles = makeStyles((theme) => ({
     root: {
         borderRadius: '5px',
         backgroundColor: theme.palette.background.paper,
         boxShadow: theme.shadows[20],
-    },
-    todoBox: {
-        minHeight: '48px',
-    },
-    todo: {
-        display: 'flex',
-		flexDirection: 'row',
-        alignItems: 'left',
-		width: '100%',
-		height: '100%',
-    },
-    todoText: {
-        marginTop: '15px',
-        marginBottom: '15px',
-        width: '100%',
-        height: 'auto',
-        color: theme.palette.text.primary,
-        '&:hover': {
-            cursor: 'pointer',
-        },
-    },
-    todoIcon: {
-        width: '60px',
-        justifyContent: 'center',
-        margin: 'auto',
-    },
-    clearIconButton: {
-        width: '60px',
-        justifyContent: 'center',
-        margin: 'auto',
-    },
-    iconRoot: {
-        textAlign: 'center'
-    },
-    radioButtonUncheckedIcon: {
-        width: "20px",
-        height: "20px",
-        borderRadius: "11px",
-        borderStyle: 'solid',
-        borderWidth: 'thin',
-    },
-    checkBox: {
-        "&:hover": {
-            "& div": {
-                width: "20px",
-                height: "20px",
-                border: '1px solid transparent',
-                backgroundImage: 'linear-gradient('+theme.palette.background.paper
-                                +', '+theme.palette.background.paper
-                                +'), radial-gradient(circle at top left,' 
-                                +'hsl(192, 100%, 67%),hsl(280, 87%, 65%))',
-                backgroundOrigin: 'border-box',
-                backgroundClip: 'content-box, border-box',
-            }
-        }
     },
     actionButtons: {
         display: 'flex',
@@ -85,12 +24,6 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-between',
         height: '55px',   
         position: 'relative', // for mobile disp 
-    },
-    hr: {
-        margin: "0px",
-        border: "none",
-        height: '1px',
-        backgroundColor: theme.palette.text.secondary,
     },
     nbItemsLeft: {
         margin: 'auto auto auto 20px',
@@ -149,7 +82,7 @@ export default function ToDoList({isSubmit, text, checked, afterSubmit}) {
     const classes = useStyles()
     const [todos, updateTodos] = useState(todosarray)
     const [filterBy, setFilterBy] = useState('all')
-    const [hoverId,sethoverId]=useState(0);
+    
     useEffect(() =>{
         console.log("useEffect is being called")
         if(isSubmit === true){
@@ -163,7 +96,12 @@ export default function ToDoList({isSubmit, text, checked, afterSubmit}) {
                 updateTodos(newTodoList)
                 
             }else{
-                const id = todos[todos.length -1].id
+                var id = 1
+                for (let i = 0; i < todos.length; i++) {
+                    if (todos[i].id > id) {
+                        id = todos[i].id
+                    }
+                }
                 const newTodo = {
                     'id': id + 1,
                     'text': text,
@@ -212,6 +150,9 @@ export default function ToDoList({isSubmit, text, checked, afterSubmit}) {
             }else return todo
         })
         updateTodos(clearTodos)
+        if(clearTodos.length===todos.length){
+            setFilterBy('all')
+        }
     }
     const countTodos = () => {
         var cpt = 0
@@ -229,12 +170,7 @@ export default function ToDoList({isSubmit, text, checked, afterSubmit}) {
 
         updateTodos(items);
     }
-    const iconCheckedStyle = {
-        background: 'linear-gradient(to right bottom, hsl(192, 100%, 67%), hsl(280, 87%, 65%))',
-        width: '4px',
-        height: '4px',
-    }
-    // const iconCheckedStyle = classes.
+    
     if(todos.length === 0) return <div></div>
     else return (
         <div className={classes.root}>
@@ -254,92 +190,13 @@ export default function ToDoList({isSubmit, text, checked, afterSubmit}) {
                                     return <div key={todo.id}></div>
                                 }
                                 else return(
-                                    <Draggable 
+                                    <ToDoItem 
                                         key={todo.id} 
-                                        draggableId={todo.text} 
-                                        index={index}
-                                    >
-                                        {(provided) => (
-                                            <div>
-                                                <Box 
-                                                    ref={provided.innerRef} 
-                                                    {...provided.draggableProps} 
-                                                    {...provided.dragHandleProps}
-                                                    className={classes.todoBox} 
-                                                    xs={12} 
-                                                
-                                                >
-                                                    <div className={classes.todo}>
-                                                        <FormControlLabel
-                                                            className={classes.todoIcon}
-                                                            control={
-                                                                <Checkbox 
-                                                                    icon={
-                                                                        <div 
-                                                                            className={
-                                                                                classes.radioButtonUncheckedIcon
-                                                                            } 
-                                                                        />
-                                                                    }
-                                                                    checkedIcon={<DoneIcon 
-                                                                                    style={{
-                                                                                        color: "white",
-                                                                                        fontSize: '15px',
-                                                                                    }}
-                                                                                />}
-                                                                    style={
-                                                                        todo.checked? 
-                                                                            iconCheckedStyle 
-                                                                            : {background: "none"}
-                                                                    }
-                                                                    name="checked" 
-                                                                    checked={todo.checked}
-                                                                    onChange={() => handleUpdateTodo(todo.id)}
-                                                                    disableRipple={true}
-                                                                    className={classes.checkBox}
-                                                                />
-                                                            }
-                                                        />
-                                                        <div
-                                                            className={classes.todo}
-                                                            onMouseOver={()=>sethoverId(todo.id)} 
-                                                            onMouseOut={()=>sethoverId(0)}
-                                                        >
-                                                            <Typography
-                                                                className= {classes.todoText}
-                                                                style={ 
-                                                                    todo.checked? {
-                                                                        textDecoration: 'line-through',
-                                                                        color: 'gray',
-                                                                    }: {}
-                                                                }
-                                                            >
-                                                                {todo.text}
-                                                            </Typography>
-                                                            <IconButton
-                                                                className={classes.clearIconButton}
-                                                                style={{
-                                                                    visibility: (hoverId!==todo.id) && 'hidden',
-                                                                    background:"none",
-                                                                }}
-                                                                disableRipple={true}
-                                                                disableFocusRipple={true}
-                                                                onClick={() => deleteTodo(todo.id)}
-                                                            >
-                                                                <Icon classes={{root: classes.iconRoot}}>
-                                                                    <img 
-                                                                        src="/images/icon-cross.svg"
-                                                                        alt="cross icon"
-                                                                    />
-                                                                </Icon>
-                                                            </IconButton>
-                                                        </div>
-                                                    </div>  
-                                                </Box>
-                                                <hr className={classes.hr}/>
-                                            </div>
-                                        )}
-                                    </Draggable>
+                                        index= {index}
+                                        todo = {todo}
+                                        handleUpdateTodo={handleUpdateTodo}
+                                        deleteTodo={deleteTodo}
+                                    />
                                 )
                             })}
                             {provided.placeholder}
