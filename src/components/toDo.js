@@ -85,6 +85,7 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: "11px",
         borderStyle: 'solid',
         borderWidth: 'thin',
+        color: theme.palette.border.primary,
     },
     checkBox: {
         "&:hover": {
@@ -100,6 +101,17 @@ const useStyles = makeStyles((theme) => ({
                 backgroundClip: 'content-box, border-box',
             }
         }
+    },
+    reorderMsgBox: {
+        marginTop: '50px',
+        display: 'flex',
+		flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    reorderMsg: {
+        fontWeight: 700,
+        fontSize: '0.7em',
+        color: theme.palette.text.secondary,
     },
 	[theme.breakpoints.down('xs')]: {
 		root: {
@@ -227,6 +239,11 @@ export default function ToDo({theme, changeTheme}) {
                     checked={todo.checked}
                     afterSubmit={afterSubmit}
                 />
+                <Box className={classes.reorderMsgBox}>
+                    <Typography className={classes.reorderMsg}>
+                        drag and drop to reorder list
+                    </Typography>
+                </Box>
             </Grid>
         </div>
     )
