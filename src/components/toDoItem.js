@@ -13,19 +13,21 @@ import DoneIcon from '@material-ui/icons/Done';
 
 const useStyles = makeStyles((theme) => ({
     todoBox: {
-        minHeight: '48px',
-        // borderBottom: '1px solid '+theme.palette.text.secondary+'',
+        minHeight: '63px',
     },
     todo: {
         display: 'flex',
 		flexDirection: 'row',
         alignItems: 'left',
 		width: '100%',
-		height: '100%',
+        minHeight: '63px',
+		// height: '100%',
     },
     todoText: {
         marginTop: '15px',
         marginBottom: '15px',
+        display: 'flex',
+        alignItems: 'center',
         width: '100%',
         height: 'auto',
         color: theme.palette.text.primary,

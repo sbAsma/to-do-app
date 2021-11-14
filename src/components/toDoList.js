@@ -76,6 +76,16 @@ const todosarray = [
         'text': 'Read for 1 hour',
         'checked': false,
     },
+    {
+        'id': 5,
+        'text': 'Pick up groceries',
+        'checked': false,
+    },
+    {
+        'id': 6,
+        'text': 'Complete Todo App on Frontend Mentor',
+        'checked': false,
+    },
 ]
 
 export default function ToDoList({isSubmit, text, checked, afterSubmit}) {

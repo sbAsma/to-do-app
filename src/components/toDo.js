@@ -18,44 +18,56 @@ const useStyles = makeStyles((theme) => ({
     root: {
 		backgroundImage: theme.palette.background.bgDesktop,
 		backgroundRepeat: "no-repeat",
-		backgroundSize: "100% 270px",
+		backgroundSize: "100% 300px",
         backgroundColor: theme.palette.background.default,
-		height: "100vh", // changed from "100%"
-        [theme.breakpoints.down('xs')]: {
-            height: "100%",
-        },
+		height: "100%", // changed from "100%"
+        // [theme.breakpoints.down('xs')]: {
+        //     height: "100%",
+        // },
         width: "100%",
 		display: 'flex',
     },
 	content: {
 		height: "auto",
-        width: "570px",
+        width: "540px",
 		display: 'flex',
 		flexDirection: 'column',
 		margin: '70px auto 130px auto',
 	},
     title: {
+        marginTop: '5px',
 		display: 'flex',
 		flexDirection: 'row',
 		width: '100%',
-		height: '50px',
-		alignItems: 'center',
+		height: '35px',
 		justifyContent: 'space-between',
-		marginBottom: '25px',
 	},
 	titleText: {
 		fontWeight: '700',
+        fontSize: '2.5rem',
         color: "white",
-        letterSpacing: "1.5rem",
+        letterSpacing: "0.7rem",
 	},
+    themeIconButton: {
+        padding: '0',
+    },
+    iconRoot: {
+        textAlign: 'center',
+        height: '30px',
+        width: '100%',
+    },
+    imageIcon: {
+        height: '100%',
+    },
     inputTodo: {
         display: 'flex',
 		flexDirection: 'row',
         alignItems: 'left',
-		marginBottom: '50px',
+        marginTop: '50px',
+		marginBottom: '25px',
         borderRadius: '5px',
 		width: '100%',
-		height: '55px',
+		height: '60px',
         backgroundColor: theme.palette.background.paper,
     },
     inputTodoTextField: {
@@ -65,19 +77,10 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: '0', 
         color: theme.palette.text.primary,
     },
-    // inputTodoText: {
-    //     color: "red",
-    // },
     inputTodoIcon: {
         width: '60px',
         justifyContent: 'center',
         margin: 'auto',
-    },
-    imageIcon: {
-        height: '100%',
-    },
-    iconRoot: {
-        textAlign: 'center'
     },
     radioButtonUncheckedIcon: {
         width: "20px",
@@ -171,6 +174,7 @@ export default function ToDo({theme, changeTheme}) {
                             background: "none",
                         }}
                         disableRipple={true}
+                        className={classes.themeIconButton}
                     >
                         {theme==='light'? <Icon classes={{root: classes.iconRoot}}>
                                             <img 
@@ -244,7 +248,7 @@ export default function ToDo({theme, changeTheme}) {
                 />
                 <Box className={classes.reorderMsgBox}>
                     <Typography className={classes.reorderMsg}>
-                        drag and drop to reorder list
+                        Drag and drop to reorder list
                     </Typography>
                 </Box>
             </Grid>
