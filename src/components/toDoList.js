@@ -113,7 +113,6 @@ export default function ToDoList({isSubmit, text, checked, afterSubmit}) {
         // Edit todo
         const todo_ = todos.find(todo => todo.id === id)
         axios.patch('todo/'+ id +'/', {
-            'text': todo_.text,
             'checked': !todo_.checked,
         }).then((res)=>{
             const updatedTodos = todos.map((todo) =>{
@@ -152,6 +151,9 @@ export default function ToDoList({isSubmit, text, checked, afterSubmit}) {
     const handleClearClick = () => {
         const clearTodos = todos.map((todo) =>{
             if(todo.checked === true) {
+                axios.patch('todo/'+ todo.id +'/', {
+                    'checked': !todo.checked,
+                })
                 return {
                     ...todo,
                     'checked': !todo.checked,
