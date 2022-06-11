@@ -105,20 +105,20 @@ const useStyles = makeStyles((theme) => ({
             }
         }
     },
-    reorderMsgBox: {
-        marginTop: '50px',
-        display: 'flex',
-		flexDirection: 'row',
-        justifyContent: 'center',
-        [theme.breakpoints.down('xs')]: {
-            marginTop: '105px',
-        }
-    },
-    reorderMsg: {
-        fontWeight: 700,
-        fontSize: '0.7em',
-        color: theme.palette.text.secondary,
-    },
+    // reorderMsgBox: {
+    //     marginTop: '50px',
+    //     display: 'flex',
+	// 	flexDirection: 'row',
+    //     justifyContent: 'center',
+    //     [theme.breakpoints.down('xs')]: {
+    //         marginTop: '105px',
+    //     }
+    // },
+    // reorderMsg: {
+    //     fontWeight: 700,
+    //     fontSize: '0.7em',
+    //     color: theme.palette.text.secondary,
+    // },
 	[theme.breakpoints.down('xs')]: {
 		root: {
 			backgroundImage: theme.palette.background.bgMobile,
@@ -246,11 +246,11 @@ export default function ToDo({theme, changeTheme}) {
                     checked={todo.checked}
                     afterSubmit={afterSubmit}
                 />
-                <Box className={classes.reorderMsgBox}>
+                {/* <Box className={classes.reorderMsgBox}>
                     <Typography className={classes.reorderMsg}>
                         Drag and drop to reorder list
                     </Typography>
-                </Box>
+                </Box> */}
             </Grid>
         </div>
     )

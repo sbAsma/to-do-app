@@ -11,6 +11,8 @@ import {
 } from '@material-ui/core'
 import ToDoItem from './toDoItem'
 
+import axios from 'axios'
+
 const useStyles = makeStyles((theme) => ({
     root: {
         borderRadius: '5px',
@@ -53,93 +55,90 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: 'transparent',
         },
     },
+    reorderMsgBox: {
+        marginTop: '50px',
+        display: 'flex',
+		flexDirection: 'row',
+        justifyContent: 'center',
+        [theme.breakpoints.down('xs')]: {
+            marginTop: '105px',
+        }
+    },
+    reorderMsg: {
+        fontWeight: 700,
+        fontSize: '0.7em',
+        color: theme.palette.text.secondary,
+    },
 }))
 
-const todosarray = [
-    {
-        'id': 1,
-        'text': 'Complete online JavaScript course',
-        'checked': true,
-    },
-    {
-        'id': 2,
-        'text': 'Jog around the park 3x',
-        'checked': false,
-    },
-    {
-        'id': 3,
-        'text': '10 minutes meditation',
-        'checked': false,
-    },
-    {
-        'id': 4,
-        'text': 'Read for 1 hour',
-        'checked': false,
-    },
-    {
-        'id': 5,
-        'text': 'Pick up groceries',
-        'checked': false,
-    },
-    {
-        'id': 6,
-        'text': 'Complete Todo App on Frontend Mentor',
-        'checked': false,
-    },
-]
+if (window.location.origin === "http://localhost:3000") {
+    axios.defaults.baseURL = "http://127.0.0.1:8000"; // development address
+} else {
+    axios.defaults.baseURL = window.location.origin; // production address
+}
 
 export default function ToDoList({isSubmit, text, checked, afterSubmit}) {
     const classes = useStyles()
-    const [todos, updateTodos] = useState(todosarray)
+    const [todos, updateTodos] = useState([])
     const [filterBy, setFilterBy] = useState('all')
     
+    useEffect(()=>{
+        // Get todo list
+        axios.get('todo/')
+        .then((res) => {
+            updateTodos(res.data)
+        }).catch((err) =>{
+            console.log(err)
+        })
+    }, [])
     useEffect(() =>{
         console.log("useEffect is being called")
+        // Create a new todo
         if(isSubmit === true){
-            if(todos.length===0){
-                const newTodo = {
-                    'id': 1,
-                    'text': text,
-                    'checked': checked,
-                }
-                const newTodoList = [newTodo]
-                updateTodos(newTodoList)
-                
-            }else{
-                var id = 1
-                for (let i = 0; i < todos.length; i++) {
-                    if (todos[i].id > id) {
-                        id = todos[i].id
-                    }
-                }
-                const newTodo = {
-                    'id': id + 1,
-                    'text': text,
-                    'checked': checked,
-                }
+            axios.post('todo/',{
+                'text': text,
+                'checked': checked,
+            }).then((res)=>{
+                const newTodo = res.data
                 const newTodoList = [...todos, newTodo]
                 updateTodos(newTodoList)
-            }
+
+            }).catch((err)=>{
+                console.log(err)
+            })
             afterSubmit()
         }
     }, [isSubmit])
     const handleUpdateTodo = (id) => {
-        const updatedTodos = todos.map((todo) =>{
-            if(todo.id===id){
-                return {
-                    ...todo,
-                    'checked': !todo.checked,
-                }
-            } else return todo
+        // Edit todo
+        const todo_ = todos.find(todo => todo.id === id)
+        axios.patch('todo/'+ id +'/', {
+            'text': todo_.text,
+            'checked': !todo_.checked,
+        }).then((res)=>{
+            const updatedTodos = todos.map((todo) =>{
+                if(todo.id===id){ 
+                    return res.data
+                } else return todo
+            })
+            updateTodos(updatedTodos)
+            
+        }).catch((err)=>{
+            console.log(err)
         })
-        updateTodos(updatedTodos)
     }
     const deleteTodo = (id) => {
-        const newTodoList = todos.filter((todo) => {
-            if(todo.id !== id) return todo
-            else return null
+        // Delete todo
+        axios.delete('todo/'+ id +'/')
+        .then((res)=>{
+            const newTodoList = todos.filter((todo) => {
+                if(todo.id !== id) return todo
+                else return null
+            })
+            updateTodos(newTodoList)
+        }).catch((err)=>{
+            console.log(err)
         })
-        updateTodos(newTodoList)
     }
     const handleAllClick = () => {
         setFilterBy('all')
@@ -183,84 +182,91 @@ export default function ToDoList({isSubmit, text, checked, afterSubmit}) {
     
     if(todos.length === 0) return <div></div>
     else return (
-        <div className={classes.root}>
-            <DragDropContext onDragEnd={handleOnDragEnd}>
-                <Droppable droppableId="todos">
-                    {(provided) => (
-                        <div 
-                            className="todos" 
-                            {...provided.droppableProps} 
-                            ref={provided.innerRef}
+        <React.Fragment>
+            <div className={classes.root}>
+                <DragDropContext onDragEnd={handleOnDragEnd}>
+                    <Droppable droppableId="todos">
+                        {(provided) => (
+                            <div 
+                                className="todos" 
+                                {...provided.droppableProps} 
+                                ref={provided.innerRef}
+                            >
+                                {todos.map((todo, index) => {
+                                    if(filterBy==='active' && todo.checked === true) {
+                                        return <div key={todo.id}></div>
+                                    }
+                                    else if(filterBy==='completed' && todo.checked === false) {
+                                        return <div key={todo.id}></div>
+                                    }
+                                    else return(
+                                        <ToDoItem 
+                                            key={todo.id} 
+                                            index= {index}
+                                            todo = {todo}
+                                            handleUpdateTodo={handleUpdateTodo}
+                                            deleteTodo={deleteTodo}
+                                        />
+                                    )
+                                })}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                </DragDropContext>
+                < Box className={classes.actionButtons} xs={12} >
+                    <Typography className={classes.nbItemsLeft} >
+                        {countTodos()} items left
+                    </Typography>
+                    <div className={classes.buttonGroup} >
+                        <Button 
+                            className={classes.button}
+                            onClick={handleAllClick} 
+                            style ={
+                                filterBy==='all'? {
+                                    color: 'hsl(220, 98%, 61%)'
+                                }: {}
+                            }
                         >
-                            {todos.map((todo, index) => {
-                                if(filterBy==='active' && todo.checked === true) {
-                                    return <div key={todo.id}></div>
-                                }
-                                else if(filterBy==='completed' && todo.checked === false) {
-                                    return <div key={todo.id}></div>
-                                }
-                                else return(
-                                    <ToDoItem 
-                                        key={todo.id} 
-                                        index= {index}
-                                        todo = {todo}
-                                        handleUpdateTodo={handleUpdateTodo}
-                                        deleteTodo={deleteTodo}
-                                    />
-                                )
-                            })}
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
-            </DragDropContext>
-            < Box className={classes.actionButtons} xs={12} >
-                <Typography className={classes.nbItemsLeft} >
-                    {countTodos()} items left
+                            All
+                        </Button>
+                        <Button 
+                            className={classes.button}
+                            onClick={handleActiveClick} 
+                            style ={
+                                filterBy==='active'? {
+                                    color: 'hsl(220, 98%, 61%)'
+                                }: {}
+                            }
+                        >
+                            Active
+                        </Button>
+                        <Button 
+                            className={classes.button} 
+                            onClick={handleCompltedClick}
+                            style ={
+                                filterBy==='completed'? {
+                                    color: 'hsl(220, 98%, 61%)'
+                                }: {}
+                            }
+                        >
+                            Completed
+                        </Button>
+                    </div>
+                    <Button 
+                        className={classes.button}
+                        onClick={handleClearClick} 
+                        style={{paddingRight: '20px',}}
+                    >
+                        Clear Completed
+                    </Button>
+                </Box>
+            </div>
+            <Box className={classes.reorderMsgBox}>
+                <Typography className={classes.reorderMsg}>
+                    Drag and drop to reorder list
                 </Typography>
-                <div className={classes.buttonGroup} >
-                    <Button 
-                        className={classes.button}
-                        onClick={handleAllClick} 
-                        style ={
-                            filterBy==='all'? {
-                                color: 'hsl(220, 98%, 61%)'
-                            }: {}
-                        }
-                    >
-                        All
-                    </Button>
-                    <Button 
-                        className={classes.button}
-                        onClick={handleActiveClick} 
-                        style ={
-                            filterBy==='active'? {
-                                color: 'hsl(220, 98%, 61%)'
-                            }: {}
-                        }
-                    >
-                        Active
-                    </Button>
-                    <Button 
-                        className={classes.button} 
-                        onClick={handleCompltedClick}
-                        style ={
-                            filterBy==='completed'? {
-                                color: 'hsl(220, 98%, 61%)'
-                            }: {}
-                        }
-                    >
-                        Completed
-                    </Button>
-                </div>
-                <Button 
-                    className={classes.button}
-                    onClick={handleClearClick} 
-                    style={{paddingRight: '20px',}}
-                >
-                    Clear Completed
-                </Button>
             </Box>
-        </div>
+        </React.Fragment>
     )
 }
